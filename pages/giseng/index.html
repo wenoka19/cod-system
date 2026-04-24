@@ -23,18 +23,25 @@
 
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-left">
-      <div class="hero-img-wrap">
-        <div class="hero-badge-float">OFFRE<br>-50%</div>
-        <div class="hero-img"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777044424/giseng2_dzqbev.webp" alt="Giseng produit" style="width:100%;height:100%;object-fit:cover;border-radius:20px;"></div>
-        <div class="hero-img-thumbs">
-          <div class="thumb active"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777044424/giseng2_dzqbev.webp" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></div>
-          <div class="thumb"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777041471/4VAUsVivtEvuOowXW2YqLggImAcQd94SycUO7Q3y_wag742.webp" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></div>
-          <div class="thumb"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777044426/giseng3_ia6r3i.gif" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></div>
-          <div class="thumb"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777044423/giseng4_bmzg3g.webp" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></div>
-        </div>
+
+    <!-- IMAGE CAROUSEL HORIZONTAL -->
+    <div class="hero-carousel-wrap">
+      <div class="hero-badge-float">OFFRE -50%</div>
+      <div class="hero-carousel" id="heroCarousel">
+        <div class="hero-slide"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777044424/giseng2_dzqbev.webp" alt="Giseng produit"></div>
+        <div class="hero-slide"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777041471/4VAUsVivtEvuOowXW2YqLggImAcQd94SycUO7Q3y_wag742.webp" alt="Giseng"></div>
+        <div class="hero-slide"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777044426/giseng3_ia6r3i.gif" alt="Giseng ingrédients"></div>
+        <div class="hero-slide"><img src="https://res.cloudinary.com/dfkw1xsgo/image/upload/v1777044423/giseng4_bmzg3g.webp" alt="Giseng résultats"></div>
+      </div>
+      <div class="carousel-dots" id="carouselDots">
+        <span class="dot active" onclick="goToSlide(0)"></span>
+        <span class="dot" onclick="goToSlide(1)"></span>
+        <span class="dot" onclick="goToSlide(2)"></span>
+        <span class="dot" onclick="goToSlide(3)"></span>
       </div>
     </div>
+
+    <!-- INFOS PRODUIT -->
     <div class="hero-right">
       <div class="stars-row">
         <span class="stars">★★★★★</span>
@@ -56,14 +63,23 @@
       </div>
       <p class="form-intro">Remplissez le formulaire ci-dessous. Paiement uniquement à la livraison.</p>
       <div id="cod-form-container"></div>
-     <script>
-window.COD_CONFIG = {
-  productId: "69eb80600541803d5c9d3895",
-  productName: "Giseng",
-  codiApiUrl: "https://web-production-57271.up.railway.app"
-};
-</script>
-<script src="https://wenoka19.github.io/cod-system/cod-form.js"></script>
+      <script>
+      window.COD_CONFIG = {
+        productId: "69eb80600541803d5c9d3895",
+        productName: "Giseng",
+        codiApiUrl: "https://web-production-57271.up.railway.app",
+        devise: "FCFA",
+        deviseUSDRate: 0.00163,
+        bundles: [
+          { name: "1 boîte Giseng", price: 14600, oldPrice: 29200, isDefault: false },
+          { name: "2 boîtes Giseng", price: 25000, oldPrice: 50000, isDefault: true, promo: "Réduction 50% aujourd'hui" },
+          { name: "3 boîtes Giseng", price: 35000, oldPrice: 75000, isDefault: false, promo: "Meilleure valeur" }
+        ],
+        upsells: [
+          { name: "Huile de massage Giseng", price: 8000, oldPrice: 16000, btnYesText: "Oui, j'ajoute l'huile !", btnYesColor: "#0096c7", btnNoText: "Non merci, je passe" },
+          { name: "Pack recharge 3 mois", price: 18000, oldPrice: 37500, btnYesText: "Oui, j'ajoute le pack !", btnYesColor: "#0096c7", btnNoText: "Non merci, terminer" }
+        ]
+      };
       </script>
       <script src="https://wenoka19.github.io/cod-system/cod-form.js"></script>
     </div>
@@ -288,16 +304,29 @@ window.COD_CONFIG = {
 </footer>
 
 <script>
+// FAQ accordion
 function toggleFaq(btn) {
   const item = btn.parentElement;
   const isOpen = item.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
   if (!isOpen) item.classList.add('open');
 }
-document.querySelectorAll('.thumb').forEach(thumb => {
-  thumb.addEventListener('click', () => {
-    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-    thumb.classList.add('active');
+
+// Carousel — swipe horizontal + dots
+function goToSlide(idx) {
+  const carousel = document.getElementById('heroCarousel');
+  const dots = document.querySelectorAll('.dot');
+  carousel.scrollTo({ left: carousel.offsetWidth * idx, behavior: 'smooth' });
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+// Met à jour les dots quand l'utilisateur swipe
+document.addEventListener('DOMContentLoaded', () => {
+  const carousel = document.getElementById('heroCarousel');
+  if (!carousel) return;
+  carousel.addEventListener('scroll', () => {
+    const idx = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
   });
 });
 </script>
