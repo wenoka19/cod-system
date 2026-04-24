@@ -133,14 +133,13 @@
     "#cod-form-container{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a2e;box-sizing:border-box;}",
     "#cod-form-container *,#cod-form-container *::before,#cod-form-container *::after{box-sizing:border-box;}",
     ".cod-wrap{background:#fff;border-radius:12px;border:1px solid rgba(0,150,199,.18);overflow:hidden;max-width:520px;margin:0 auto;}",
-    ".cod-head{background:#0096c7;padding:10px 16px;text-align:center;color:#fff;font-size:12px;font-weight:500;}",
     ".cod-body{padding:16px;}",
+    ".cod-intro{font-size:20px;font-weight:700;color:#111;margin:16px 0 14px;line-height:1.4;}",
     ".cod-label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}",
     ".cod-bundles{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}",
     ".cod-bundle{border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fafafa;position:relative;transition:border-color .15s,background .15s;}",
     ".cod-bundle:hover{border-color:#0096c7;}",
     ".cod-bundle.cod-selected{border-color:#0096c7;background:#e0f4fb;}",
-    ".cod-bundle .cod-pop{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#0096c7;color:#fff;font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;}",
     ".cod-radio{width:16px;height:16px;border-radius:50%;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;}",
     ".cod-selected .cod-radio{border-color:#0096c7;background:#0096c7;}",
     ".cod-selected .cod-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;}",
@@ -157,7 +156,8 @@
     ".cod-input:focus-within{border-color:#0096c7;}",
     ".cod-icon{width:38px;height:42px;background:#0096c7;display:flex;align-items:center;justify-content:center;flex-shrink:0;}",
     ".cod-icon svg{width:16px;height:16px;fill:#fff;}",
-    ".cod-input input,.cod-input select{flex:1;min-width:0;border:none;padding:0 10px;height:42px;font-size:13px;background:transparent;color:#1a1a2e;outline:none;font-family:inherit;}",
+    ".cod-input input,.cod-input select{flex:1;min-width:0;border:none;padding:0 10px;height:44px;font-size:16px;background:transparent;color:#1a1a2e;outline:none;font-family:inherit;}",
+    "#cod-form-container input,#cod-form-container select{font-size:16px !important;}",
     "@keyframes cod-bounce{0%,100%{transform:scale(1);}30%{transform:scale(1.03);}60%{transform:scale(.98);}}",
     ".cod-submit{width:100%;padding:13px 16px;background:#0096c7;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;animation:cod-bounce 1.6s ease infinite;transition:background .15s;margin-top:6px;}",
     ".cod-submit:hover{background:#007aad;animation:none;}",
@@ -169,11 +169,9 @@
     ".cod-sticky{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid rgba(0,0,0,.1);padding:10px 16px;z-index:2147483600;transform:translateY(100%);transition:transform .3s ease;display:flex;align-items:center;gap:12px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}",
     ".cod-sticky.cod-show{transform:translateY(0);}",
     ".cod-sticky-info{flex:1;min-width:0;}",
-    ".cod-sticky-name{font-size:13px;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}",
-    ".cod-sticky-p{font-size:12px;color:#6b7280;}",
-    ".cod-sticky-p .cod-snew{color:#004e6b;font-weight:700;}",
-    ".cod-sticky-p .cod-sold{color:#c0392b;text-decoration:line-through;font-size:11px;}",
-    ".cod-sticky-btn{flex-shrink:0;padding:10px 16px;background:#0096c7;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}",
+    ".cod-sticky-name{font-size:14px;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}",
+    ".cod-sticky-btn{flex-shrink:0;padding:12px 16px;background:#0096c7;border:none;border-radius:8px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;display:flex;align-items:center;gap:8px;animation:cod-bounce 1.6s ease infinite;transition:background .15s;}",
+    ".cod-sticky-btn:hover{background:#007aad;animation:none;}",
     ".cod-overlay{position:fixed;inset:0;background:#f8f6f2;z-index:2147483647;overflow-y:auto;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a2e;}",
     ".cod-overlay .cod-top{background:#0096c7;padding:14px 20px;text-align:center;color:#fff;}",
     ".cod-step-hint{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.8);}",
@@ -287,9 +285,6 @@
     var bundlesHtml = CONFIG.bundles
       .map(function (bundle, i) {
         var sel = i === state.bundleIndex ? " cod-selected" : "";
-        var pop = bundle.promo
-          ? '<div class="cod-pop">' + esc(bundle.promo) + "</div>"
-          : "";
         var promoTag = bundle.promo
           ? '<div class="cod-bpromo">' + esc(bundle.promo) + "</div>"
           : "";
@@ -299,7 +294,6 @@
           '" data-idx="' +
           i +
           '">' +
-          pop +
           '<div class="cod-radio"></div>' +
           '<div class="cod-binfo"><div class="cod-bname">' +
           esc(bundle.name) +
@@ -325,12 +319,12 @@
 
     container.innerHTML =
       '<div class="cod-wrap">' +
-      '<div class="cod-head">📦 Livraison à domicile · Paiement à la réception</div>' +
       '<div class="cod-body">' +
       '<div class="cod-label">Choisissez votre offre</div>' +
       '<div class="cod-bundles" data-role="bundles">' +
       bundlesHtml +
       "</div>" +
+      '<p class="cod-intro">Remplissez le formulaire ci-dessous pour passer votre commande. Paiement à la livraison.</p>' +
       '<div class="cod-err" data-role="err"></div>' +
       '<div class="cod-field">' +
       '<label>Prénom <span class="cod-req">*</span></label>' +
@@ -377,12 +371,11 @@
       sticky.innerHTML =
         '<div class="cod-sticky-info">' +
         '<div class="cod-sticky-name" data-role="s-name"></div>' +
-        '<div class="cod-sticky-p"><span class="cod-snew" data-role="s-new"></span>' +
-        '<span class="cod-sold" data-role="s-old"></span></div>' +
         "</div>" +
         '<button type="button" class="cod-sticky-btn" data-role="s-btn">' +
-        ICONS.cart +
-        " Commander</button>";
+        "<span>Commander</span>" +
+        '<span class="cod-btn-price" data-role="s-btn-price"></span>' +
+        "</button>";
       document.body.appendChild(sticky);
     }
     refreshStickyContent();
@@ -393,13 +386,9 @@
   function refreshStickyContent() {
     var b = CONFIG.bundles[state.bundleIndex];
     var name = $('[data-role="s-name"]');
-    var snew = $('[data-role="s-new"]');
-    var sold = $('[data-role="s-old"]');
+    var btnPrice = $('[data-role="s-btn-price"]');
     if (name) name.textContent = CONFIG.productName + " — " + b.name;
-    if (snew) snew.textContent = fmt(b.price);
-    if (sold)
-      sold.textContent =
-        b.oldPrice > b.price ? " · " + fmt(b.oldPrice) : "";
+    if (btnPrice) btnPrice.textContent = fmt(b.price);
   }
 
   function bindFormEvents() {
