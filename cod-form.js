@@ -22,22 +22,18 @@
   CONFIG.bundles = Array.isArray(CONFIG.bundles) ? CONFIG.bundles : [];
   CONFIG.upsells = Array.isArray(CONFIG.upsells) ? CONFIG.upsells : [];
 
-  if (CONFIG.bundles.length === 0) {
-    console.error("[cod-form] At least one bundle is required.");
-    return;
-  }
+  // Remember which productName was set inline on the LP — used so the API
+  // response only overrides it when CODI actually has a name on the product.
+  var PRODUCT_NAME_FROM_CONFIG = window.COD_CONFIG && window.COD_CONFIG.productName;
 
   var API = CONFIG.codiApiUrl.replace(/\/$/, "");
   var LS_KEY = "cod_customer";
 
   // ────────────────────────────────────────────────────────────────
-  //  State
+  //  State — bundleIndex is recomputed in init() after the API merge.
   // ────────────────────────────────────────────────────────────────
-  var defaultIdx = CONFIG.bundles.findIndex(function (b) {
-    return b.isDefault;
-  });
   var state = {
-    bundleIndex: defaultIdx >= 0 ? defaultIdx : 0,
+    bundleIndex: 0,
     orderId: null,
     upsellsAccepted: [],
     detectedCountry: "",
@@ -220,6 +216,10 @@
     ".cod-ok-num .cod-nv{font-size:22px;font-weight:700;margin-top:4px;}",
     ".cod-wa{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#065f46;line-height:1.6;margin-top:14px;}",
     ".cod-wa svg{width:20px;height:20px;fill:#059669;flex-shrink:0;margin-top:1px;}",
+    ".cod-spinner{display:flex;align-items:center;justify-content:center;min-height:240px;padding:40px 20px;}",
+    ".cod-spinner-ring{width:36px;height:36px;border:3px solid rgba(0,150,199,.18);border-top-color:#0096c7;border-radius:50%;animation:cod-spin .8s linear infinite;}",
+    "@keyframes cod-spin{to{transform:rotate(360deg);}}",
+    ".cod-fatal{padding:24px;text-align:center;font-size:13px;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;}",
   ].join("\n");
 
   function injectCSS() {
@@ -849,14 +849,81 @@
   }
 
   // ────────────────────────────────────────────────────────────────
+  //  Live config fetch
+  // ────────────────────────────────────────────────────────────────
+  function showSpinner() {
+    var c = document.getElementById("cod-form-container");
+    if (c) c.innerHTML = '<div class="cod-spinner"><div class="cod-spinner-ring"></div></div>';
+  }
+
+  function showFatal(msg) {
+    var c = document.getElementById("cod-form-container");
+    if (c) c.innerHTML = '<div class="cod-fatal">' + esc(msg) + "</div>";
+  }
+
+  function fetchAndMerge() {
+    if (!CONFIG.productId) return Promise.resolve();
+    return fetch(API + "/api/products/" + encodeURIComponent(CONFIG.productId), {
+      cache: "no-store",
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (json) {
+        var p = json && json.data;
+        if (!p) throw new Error("Réponse invalide");
+        if (Array.isArray(p.bundles) && p.bundles.length > 0) {
+          CONFIG.bundles = p.bundles;
+        }
+        if (Array.isArray(p.upsells)) {
+          CONFIG.upsells = p.upsells.filter(function (u) {
+            return u && u.active !== false;
+          });
+        }
+        if (p.devise) CONFIG.devise = p.devise;
+        if (typeof p.deviseUSDRate === "number") {
+          CONFIG.deviseUSDRate = p.deviseUSDRate;
+        }
+        // productName: API wins when it has one; otherwise keep what was
+        // inlined in window.COD_CONFIG (fallback handles offline preview).
+        if (p.name) {
+          CONFIG.productName = p.name;
+        } else if (PRODUCT_NAME_FROM_CONFIG) {
+          CONFIG.productName = PRODUCT_NAME_FROM_CONFIG;
+        }
+      })
+      .catch(function (err) {
+        console.warn(
+          "[cod-form] Product fetch failed, using embedded fallback config.",
+          err && err.message ? err.message : err
+        );
+      });
+  }
+
+  // ────────────────────────────────────────────────────────────────
   //  Init
   // ────────────────────────────────────────────────────────────────
   function init() {
     injectCSS();
     state.fbc = getFbc();
     state.fbp = getFbp();
-    renderForm();
-    detectCountry().then(sendViewContent);
+    showSpinner();
+
+    fetchAndMerge().then(function () {
+      if (CONFIG.bundles.length === 0) {
+        console.error("[cod-form] At least one bundle is required.");
+        showFatal("Configuration produit introuvable.");
+        return;
+      }
+      var defaultIdx = CONFIG.bundles.findIndex(function (b) {
+        return b.isDefault;
+      });
+      state.bundleIndex = defaultIdx >= 0 ? defaultIdx : 0;
+
+      renderForm();
+      detectCountry().then(sendViewContent);
+    });
   }
 
   if (document.readyState === "loading") {
