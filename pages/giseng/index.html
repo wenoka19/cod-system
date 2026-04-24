@@ -56,23 +56,14 @@
       </div>
       <p class="form-intro">Remplissez le formulaire ci-dessous. Paiement uniquement à la livraison.</p>
       <div id="cod-form-container"></div>
-      <script>
-      window.COD_CONFIG = {
-        productId: "69eb80600541803d5c9d3895",
-        productName: "Giseng",
-        codiApiUrl: "https://web-production-57271.up.railway.app",
-        devise: "FCFA",
-        deviseUSDRate: 0.00163,
-        bundles: [
-          { name: "1 boîte Giseng", price: 14600, oldPrice: 29200, isDefault: false },
-          { name: "2 boîtes Giseng", price: 25000, oldPrice: 50000, isDefault: true, promo: "Réduction 50% aujourd'hui" },
-          { name: "3 boîtes Giseng", price: 35000, oldPrice: 75000, isDefault: false, promo: "Meilleure valeur" }
-        ],
-        upsells: [
-          { name: "Huile de massage Giseng", price: 8000, oldPrice: 16000, btnYesText: "Oui, j'ajoute l'huile !", btnYesColor: "#0096c7", btnNoText: "Non merci, je passe" },
-          { name: "Pack recharge 3 mois", price: 18000, oldPrice: 37500, btnYesText: "Oui, j'ajoute le pack !", btnYesColor: "#0096c7", btnNoText: "Non merci, terminer" }
-        ]
-      };
+     <script>
+window.COD_CONFIG = {
+  productId: "69eb80600541803d5c9d3895",
+  productName: "Giseng",
+  codiApiUrl: "https://web-production-57271.up.railway.app"
+};
+</script>
+<script src="https://wenoka19.github.io/cod-system/cod-form.js"></script>
       </script>
       <script src="https://wenoka19.github.io/cod-system/cod-form.js"></script>
     </div>
