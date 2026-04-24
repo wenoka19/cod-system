@@ -8,6 +8,12 @@
 (function () {
   "use strict";
 
+  // Bump this + the ?v=N param on the embedded <script src> every time the
+  // file changes. The console log lets you confirm in devtools that the LP
+  // is running the version you just shipped.
+  const COD_FORM_VERSION = "1.3.0";
+  console.log("[cod-form] version", COD_FORM_VERSION);
+
   // ────────────────────────────────────────────────────────────────
   //  Config validation
   // ────────────────────────────────────────────────────────────────
@@ -193,18 +199,18 @@
     ".cod-recap-row.cod-total .cod-nw{color:#004e6b;font-size:15px;}",
     ".cod-savings{background:#fef2f2;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;color:#c0392b;text-align:center;margin-top:8px;}",
     ".cod-up-card{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:18px;border:.5px solid rgba(0,0,0,.07);}",
-    ".cod-up-img{width:100%;height:150px;background:linear-gradient(135deg,#e0f4fb,#b3e5f5);display:flex;align-items:center;justify-content:center;font-size:60px;}",
-    ".cod-up-img img{width:100%;height:100%;object-fit:contain;}",
+    ".cod-up-img{width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#e0f4fb,#b3e5f5);display:flex;align-items:center;justify-content:center;font-size:80px;}",
+    ".cod-up-img img{width:100%;height:100%;object-fit:cover;display:block;}",
     ".cod-up-info{padding:16px;}",
-    ".cod-up-name{font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:6px;}",
-    ".cod-up-desc{font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:12px;}",
+    ".cod-up-name{font-size:24px;font-weight:700;color:#1a1a2e;margin-bottom:8px;line-height:1.25;}",
+    ".cod-up-desc{font-size:18px;color:#6b7280;line-height:1.5;margin-bottom:14px;}",
     ".cod-up-p{display:flex;align-items:baseline;gap:10px;}",
-    ".cod-up-nw{font-size:22px;font-weight:700;color:#004e6b;}",
-    ".cod-up-old{font-size:14px;color:#c0392b;text-decoration:line-through;font-weight:600;}",
+    ".cod-up-nw{font-size:24px;font-weight:700;color:#004e6b;}",
+    ".cod-up-old{font-size:18px;color:#c0392b;text-decoration:line-through;font-weight:600;}",
     ".cod-up-badge{margin-left:auto;background:#e0f4fb;color:#004e6b;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}",
-    ".cod-btn-yes{width:100%;padding:15px 16px;border:none;border-radius:8px;color:#fff;font-family:inherit;animation:cod-bounce 1.6s ease infinite;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px;font-size:15px;font-weight:700;}",
+    ".cod-btn-yes{width:100%;padding:16px 18px;border:none;border-radius:8px;color:#fff;font-family:inherit;animation:cod-bounce 1.6s ease infinite;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px;font-size:24px;font-weight:700;}",
     ".cod-btn-yes:hover{animation:none;filter:brightness(.92);}",
-    ".cod-btn-no{width:100%;padding:10px;background:transparent;border:none;color:#6b7280;font-size:13px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:underline;text-underline-offset:3px;}",
+    ".cod-btn-no{width:100%;padding:12px;background:transparent;border:none;color:#6b7280;font-size:20px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:underline;text-underline-offset:3px;}",
     ".cod-ok-ic{width:68px;height:68px;background:#0096c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}",
     ".cod-ok-ic svg{width:34px;height:34px;fill:#fff;}",
     ".cod-ok-t{font-size:26px;font-weight:700;text-align:center;color:#1a1a2e;margin-bottom:10px;}",
@@ -226,6 +232,16 @@
     s.id = "cod-form-style";
     s.textContent = CSS;
     document.head.appendChild(s);
+
+    // Cache-Control meta. Note: browsers don't actually honor this for the
+    // script itself — real cache-busting is the ?v=N on the <script src>.
+    if (!document.getElementById("cod-form-meta")) {
+      var meta = document.createElement("meta");
+      meta.id = "cod-form-meta";
+      meta.setAttribute("http-equiv", "Cache-Control");
+      meta.setAttribute("content", "no-cache, no-store, must-revalidate");
+      document.head.appendChild(meta);
+    }
   }
 
   // ────────────────────────────────────────────────────────────────
@@ -666,10 +682,15 @@
     progressHtml +=
       '<span class="cod-plabel">Offre ' + (idx + 1) + "/" + total + "</span>";
 
-    var acceptedSoFar = state.upsellsAccepted.map(function (i) {
-      return ups[i];
-    });
-    var recap = buildRecap(acceptedSoFar);
+    // Recap appears from upsell 2 onwards — the first upsell deliberately
+    // hides the customer's order total so the offer lands clean.
+    var recap = null;
+    if (idx >= 1) {
+      var acceptedSoFar = state.upsellsAccepted.map(function (i) {
+        return ups[i];
+      });
+      recap = buildRecap(acceptedSoFar);
+    }
 
     var imgHtml = u.image
       ? '<img src="' + esc(u.image) + '" alt="">'
@@ -690,14 +711,12 @@
         : "Dernière offre avant la livraison") +
       "</div>" +
       "</div>" +
-      '<div class="cod-urgency">⏰ Offre exclusive réservée juste pour vous — expire bientôt</div>' +
+      '<div class="cod-urgency">Attends — vous devez absolument lire ceci 👇</div>' +
       '<div class="cod-overlay-body">' +
       '<div class="cod-progress">' +
       progressHtml +
       "</div>" +
-      '<div class="cod-recap">' +
-      recap.html +
-      "</div>" +
+      (recap ? '<div class="cod-recap">' + recap.html + "</div>" : "") +
       '<div class="cod-up-card">' +
       '<div class="cod-up-img">' +
       imgHtml +
