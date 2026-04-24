@@ -24,14 +24,27 @@ body {
   line-height: 1.7;
 }
 
-.full-img {
+.full-img-section {
   width: 100%;
-  height: 320px;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+  background: #fff;
+}
+.full-img-section.blue-bg { background: var(--brand-light); }
+
+.full-img {
+  width: 400px;
+  height: 400px;
   object-fit: cover;
   display: block;
+  border-radius: 16px;
 }
-@media (max-width: 768px) {
-  .full-img { height: 220px; }
+@media (max-width: 480px) {
+  .full-img {
+    width: 100%;
+    height: 320px;
+  }
 }
 
 /* ── Barre annonce ─────────────────────────────────── */
